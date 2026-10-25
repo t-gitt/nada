@@ -62,7 +62,7 @@
       {{#hero.image}}
       <img class="hero-art" src="{{src}}" width="{{w}}" height="{{h}}" alt="{{{hero.image_alt}}}" fetchpriority="high">
       {{/hero.image}}
-      <h1 class="hero-title"><span>Nada</span> <span>Abu Taleb</span></h1>
+      <h1 class="visually-hidden">Nada Abu Taleb</h1>
 
       <div class="hero-whisper lit">
         <p class="kicker" data-reveal>{{{hero.greeting}}}</p>
@@ -142,28 +142,40 @@
         <h2 data-reveal>{{{title}}}</h2>
         {{#line}}<p class="room-line" data-reveal>“{{{line}}}”</p>{{/line}}
       </header>
-      {{#isInk}}
-      <div class="ink-wrap">
-        <div class="ink-track gallery" tabindex="0" aria-label="{{{title}}} works, scroll sideways">
-      {{/isInk}}
-      {{^isInk}}
-      <div class="{{layout}} gallery">
-      {{/isInk}}
-        {{#works}}
-        <button type="button" class="work{{#wide}} is-wide{{/wide}}" data-full="{{full}}" data-w="{{w}}" data-h="{{h}}" data-caption="{{{caption}}}" aria-label="View {{{label}}}">
-          <img src="{{sm}}" width="{{w}}" height="{{h}}" alt="{{{alt}}}" loading="lazy" decoding="async" draggable="false">
-          <span class="cap">{{{short}}}</span>
-        </button>
-        {{/works}}
-      </div>
-      {{#isInk}}
-        <div class="ink-controls lit">
-          <button type="button" class="ink-btn" data-dir="-1" aria-label="Previous works">←</button>
-          <span class="ink-meter"><span></span></span>
-          <button type="button" class="ink-btn" data-dir="1" aria-label="Next works">→</button>
+      <!-- The corridor: a sideways row of the works -->
+      <div class="track-wrap">
+        <div class="gallery track frame--{{frame}}" tabindex="0" aria-label="{{{title}}} works">
+          {{#works}}
+          {{> work}}
+          {{/works}}
+        </div>
+        <div class="track-controls lit">
+          <button type="button" class="track-btn" data-dir="-1" aria-label="Previous works">←</button>
+          <span class="track-meter"><span></span></span>
+          <button type="button" class="track-btn" data-dir="1" aria-label="Next works">→</button>
+          <a class="door" href="#{{id}}/all" aria-haspopup="dialog">
+            <svg class="door-art" viewBox="0 0 44 64" aria-hidden="true">
+              <rect class="door-glow" x="6" y="4" width="32" height="58"/>
+              <path class="door-frame" d="M4 63 V3 H40 V63"/>
+              <g class="door-leaf"><rect x="6" y="4" width="32" height="58"/><circle cx="32" cy="35" r="1.6"/></g>
+            </svg>
+            <span class="door-text"><span>Step inside</span><small>all {{count}}</small></span>
+          </a>
         </div>
       </div>
-      {{/isInk}}
+      <!-- The room itself: every work at once, opened by the door -->
+      <dialog id="{{id}}-all" class="room-all" aria-label="{{{title}}}, all works">
+        <header class="room-all-head">
+          <p class="eyebrow">Room {{num}} · {{count}}</p>
+          <h2>{{{title}}}</h2>
+          <button type="button" class="room-all-close">← Back to the corridor</button>
+        </header>
+        <div class="gallery grid frame--{{roomFrame}}">
+          {{#works}}
+          {{> work}}
+          {{/works}}
+        </div>
+      </dialog>
     </section>
     {{#divider}}
     <svg class="scribble lit" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="{{divider}}"/></svg>

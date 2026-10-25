@@ -7,7 +7,7 @@
   const coarse = matchMedia('(pointer: coarse)').matches;
 
   /* ---------------------------------------------------------------- galleries */
-  // Works are rendered by the build; only the pinned sketches need a tilt.
+  // Works are rendered by the build; the pinned-paper frame tilts each one a little.
   // Deterministic so they don't reshuffle on every visit.
   $$('.gallery').forEach((g) => $$('.work', g).forEach((b, i) => {
     b.style.setProperty('--rot', (Math.sin(i * 12.9898 + 5) * 3).toFixed(2) + 'deg');
@@ -45,11 +45,19 @@
 
   /* ---------------------------------------------------------------- the eyes */
   const pairs = [];
-  // Eyes hide in the empty dark, never on top of the words
+  // Eyes hide in the empty dark, never on top of the words or the pictures
+  const WORDS = '.lit, .cap, h2, p, li, blockquote, .work, .story-figure img, .about-figure, .avatar';
+  // Where a pair sits, ignoring the drift of its flee animation
+  const boxOf = (el) => {
+    const l = el.parentElement.getBoundingClientRect();
+    const left = l.left + el.offsetLeft, top = l.top + el.offsetTop;
+    return { left, top, right: left + el.offsetWidth, bottom: top + el.offsetHeight };
+  };
   const overlapsWords = (el) => {
-    const b = el.getBoundingClientRect();
-    return [...$$('.lit', el.closest('section, footer')), $('.switch-tip')].some((t) => {
+    const b = boxOf(el);
+    return [...$$(WORDS, el.closest('section, footer')), $('.switch-tip')].some((t) => {
       const r = t.getBoundingClientRect();
+      if (!r.width || !r.height) return false;
       return b.right > r.left - 24 && b.left < r.right + 24 && b.bottom > r.top - 24 && b.top < r.bottom + 24;
     });
   };
@@ -78,7 +86,7 @@
       if (best && d <= best.d) continue;
       el.style.left = left + '%';
       el.style.top = top + '%';
-      const r = el.getBoundingClientRect(), box = el.parentElement.getBoundingClientRect();
+      const r = boxOf(el), box = el.parentElement.getBoundingClientRect();
       if (r.left < box.left + 6 || r.right > box.right - 6 || overlapsWords(el)) continue;
       best = { left, top, d };
       if (d >= gap) break;
@@ -114,10 +122,21 @@
     pairs.forEach(blink);
   }
 
+  let lastAudit = 0;
   const updateEyes = (now) => {
+    // Images loading in and text revealing shift the layout under the eyes,
+    // so every so often any pair that has ended up on the words shuts and moves
+    const audit = now - lastAudit > 600;
+    if (audit) lastAudit = now;
     for (const p of pairs) {
       const b = p.el.getBoundingClientRect();
       if (b.bottom < -50 || b.top > innerHeight + 50) continue;
+      if (audit && !p.hidden && overlapsWords(p.el)) {
+        p.hidden = true; p.since = now - 1200;
+        spots.delete(p.el);
+        p.el.classList.add('flee');
+        continue;
+      }
       const cx = b.left + b.width / 2, cy = b.top + b.height / 2;
       const dx = cx - x, dy = cy - y, d = Math.hypot(dx, dy) || 1;
       const reach = Math.hypot(dx / rx, dy / ry); // < 1 means inside the light
@@ -129,14 +148,15 @@
         p.el.style.setProperty('--fx', (dx / d) * 40 + 'px');
         p.el.style.setProperty('--fy', (dy / d) * 40 + 'px');
         p.el.classList.add('flee');
-        p.el.classList.remove('wake');
       } else if (p.hidden && now - p.since > 2200 && reach > 1.4) {
         // Re-emerge somewhere else, once the light has moved on
         if (!place(p.el, p.edges)) { p.since = now; continue; }
+        // Jump to the new spot unseen, then fade in there
+        p.el.classList.add('placing');
         p.el.style.setProperty('--fx', '0px');
         p.el.style.setProperty('--fy', '0px');
-        p.el.classList.remove('flee');
-        p.el.classList.add('wake');
+        void p.el.offsetWidth;
+        p.el.classList.remove('placing', 'flee');
         p.hidden = false;
       } else if (!p.hidden) {
         // Watch the light
@@ -241,40 +261,84 @@
     });
   }
 
-  /* ---------------------------------------------------------------- ink track */
-  const track = $('.ink-track');
-  const meter = $('.ink-meter span');
-  const updateMeter = () => {
-    const max = track.scrollWidth - track.clientWidth;
-    const vis = track.clientWidth / track.scrollWidth;
-    meter.style.width = vis * 100 + '%';
-    meter.style.left = (max > 0 ? (track.scrollLeft / max) * (1 - vis) * 100 : 0) + '%';
+  /* ---------------------------------------------------------------- the corridors */
+  // Every room is a sideways row; the door at the end opens the whole room
+  $$('.track-wrap').forEach((wrap) => {
+    const track = $('.track', wrap);
+    const meter = $('.track-meter span', wrap);
+    const updateMeter = () => {
+      const max = track.scrollWidth - track.clientWidth;
+      const vis = track.clientWidth / track.scrollWidth;
+      meter.style.width = vis * 100 + '%';
+      meter.style.left = (max > 0 ? (track.scrollLeft / max) * (1 - vis) * 100 : 0) + '%';
+    };
+    track.addEventListener('scroll', updateMeter, { passive: true });
+    addEventListener('resize', updateMeter);
+    addEventListener('load', updateMeter);
+
+    $$('.track-btn', wrap).forEach((b) => b.addEventListener('click', () => {
+      track.scrollBy({ left: +b.dataset.dir * track.clientWidth * 0.75, behavior: reduced ? 'auto' : 'smooth' });
+    }));
+
+    let drag = null;
+    track.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse' || e.button !== 0 || track.scrollWidth <= track.clientWidth) return;
+      drag = { x: e.clientX, left: track.scrollLeft, moved: false };
+    });
+    addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x;
+      if (!drag.moved && Math.abs(dx) > 5) { drag.moved = true; track.classList.add('dragging'); }
+      if (drag.moved) track.scrollLeft = drag.left - dx;
+    });
+    addEventListener('pointerup', () => {
+      if (!drag) return;
+      // Let the click that ends a drag be swallowed (works have pointer-events off while dragging)
+      setTimeout(() => track.classList.remove('dragging'), 0);
+      drag = null;
+    });
+  });
+
+  /* ---------------------------------------------------------------- the full rooms */
+  // Each opens at its own address (#charcoal/all), so Back closes it and the link can be shared
+  const roomFromHash = () => {
+    const m = location.hash.match(/^#([\w-]+)\/all$/);
+    return m && $('#' + m[1] + '-all');
   };
-  track.addEventListener('scroll', updateMeter, { passive: true });
-  addEventListener('resize', updateMeter);
-  addEventListener('load', updateMeter);
-
-  $$('.ink-btn').forEach((b) => b.addEventListener('click', () => {
-    track.scrollBy({ left: +b.dataset.dir * track.clientWidth * 0.75, behavior: reduced ? 'auto' : 'smooth' });
+  const openRoom = (dlg) => {
+    if (!dlg || dlg.open) return;
+    dlg.scrollTop = 0;
+    dlg.showModal();
+    root.classList.add('room-open');
+  };
+  let pushed = false; // did we add the history step (so Back can undo it)?
+  $$('.room-all').forEach((dlg) => {
+    $('.room-all-close', dlg).addEventListener('click', () => {
+      if (pushed) history.back(); else dlg.close();
+    });
+    dlg.addEventListener('close', () => {
+      root.classList.remove('room-open');
+      pushed = false;
+      // Leave the room's address without adding a history step
+      if (roomFromHash() === dlg) history.replaceState(null, '', '#' + dlg.id.replace(/-all$/, ''));
+      $('.door', dlg.closest('.room')).focus({ preventScroll: true });
+    });
+  });
+  $$('.door').forEach((d) => d.addEventListener('click', (e) => {
+    e.preventDefault();
+    history.pushState(null, '', d.getAttribute('href'));
+    pushed = true;
+    openRoom(roomFromHash());
   }));
-
-  let drag = null;
-  track.addEventListener('pointerdown', (e) => {
-    if (e.pointerType !== 'mouse' || e.button !== 0) return;
-    drag = { x: e.clientX, left: track.scrollLeft, moved: false };
+  addEventListener('popstate', () => {
+    const want = roomFromHash();
+    $$('.room-all').forEach((dlg) => { if (dlg.open && dlg !== want) dlg.close(); });
+    openRoom(want);
   });
-  addEventListener('pointermove', (e) => {
-    if (!drag) return;
-    const dx = e.clientX - drag.x;
-    if (!drag.moved && Math.abs(dx) > 5) { drag.moved = true; track.classList.add('dragging'); }
-    if (drag.moved) track.scrollLeft = drag.left - dx;
-  });
-  addEventListener('pointerup', () => {
-    if (!drag) return;
-    // Let the click that ends a drag be swallowed (works have pointer-events off while dragging)
-    setTimeout(() => track.classList.remove('dragging'), 0);
-    drag = null;
-  });
+  if (roomFromHash()) {
+    roomFromHash().closest('.room').scrollIntoView();
+    openRoom(roomFromHash());
+  }
 
   /* ---------------------------------------------------------------- lightbox */
   const lb = $('#lightbox');

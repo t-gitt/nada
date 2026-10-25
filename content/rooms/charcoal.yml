@@ -1,5 +1,7 @@
 title: "Charcoal"
 line: "Huge bodies, jagged limbs, hollow eyes."
+frame: sketch
+room_frame: gallery
 works:
   - image: /media/charcoal/01.jpg
   - image: /media/charcoal/02.jpg

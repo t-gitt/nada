@@ -4,6 +4,10 @@ The site loads in darkness. The visitor's cursor is a flickering candle (on phon
 in the middle of the screen), and the art only appears where the light falls. Eyes glow in the empty
 corners and flee from the light. The light switch in the nav restores the power for regular browsing.
 
+Each room is a sideways row of works (the corridor). The door at the end of the row opens the whole room as
+a full-screen page at `#<room>/all`. Each room sets a frame style for its row (`frame`) and for its full
+page (`room_frame`) in its content file. Either can be `paper`, `sketch`, `gallery` or `none`.
+
 **Nada edits the site at [app.pagescms.org](https://app.pagescms.org).** She doesn't need code. See
 [EDITING.md](EDITING.md).
 
@@ -11,9 +15,9 @@ corners and flee from the light. The light switch in the nav restores the power 
 
 ```
 content/site.yml          all the words on the site (and the photos of Nada)
-content/rooms/*.yml       the artworks in each room, in order, with optional title/year/medium
+content/rooms/*.yml       each room's frame styles and its artworks, in order, with optional title/year/medium
 media/                    original uploads, any size, straight from a phone or scanner
-src/                      the page template, styles and script
+src/                      the page template (index.html, plus work.html for one artwork), styles and script
 build.mjs                 content + media -> dist/ (resizes images to webp, fills the template)
 .pages.yml                the editing dashboard's forms
 .github/workflows/        builds and deploys to GitHub Pages on every push
@@ -46,5 +50,5 @@ npm start        # builds into dist/ and serves it at http://localhost:8000
 ```
 
 To change the design, edit `src/`. To change wording or artworks, edit `content/`, or let Nada do it in
-the dashboard. The four rooms each have their own hand-made layout, so adding a fifth room means
-editing `ROOMS` in `build.mjs`, the CSS for its layout, and `.pages.yml`.
+the dashboard. To add a fifth room, add it to `ROOMS` in `build.mjs`, create its file in `content/rooms/`,
+and add an entry for it in `.pages.yml`.

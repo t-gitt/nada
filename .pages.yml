@@ -46,6 +46,26 @@ content:
       - name: line
         label: Quote under the name
         type: string
+      - name: frame
+        label: Frame style in the row
+        type: select
+        description: How the artworks are framed in the sideways row on the main page.
+        options:
+          values:
+            - { value: paper, label: "Pinned paper — taped to the wall, slightly tilted" }
+            - { value: sketch, label: "Sketched frame — a rough, hand-drawn border" }
+            - { value: gallery, label: "Gallery frame — light mat and a dark frame" }
+            - { value: none, label: "No frame — just the artwork" }
+      - name: room_frame
+        label: Frame style inside the room
+        type: select
+        description: How the artworks are framed on the full room page that opens from the door.
+        options:
+          values:
+            - { value: paper, label: "Pinned paper — taped to the wall, slightly tilted" }
+            - { value: sketch, label: "Sketched frame — a rough, hand-drawn border" }
+            - { value: gallery, label: "Gallery frame — light mat and a dark frame" }
+            - { value: none, label: "No frame — just the artwork" }
       - name: works
         label: Artworks (drag to reorder — the first one is the preview)
         component: artwork
@@ -66,6 +86,26 @@ content:
       - name: line
         label: Quote under the name
         type: string
+      - name: frame
+        label: Frame style in the row
+        type: select
+        description: How the artworks are framed in the sideways row on the main page.
+        options:
+          values:
+            - { value: paper, label: "Pinned paper — taped to the wall, slightly tilted" }
+            - { value: sketch, label: "Sketched frame — a rough, hand-drawn border" }
+            - { value: gallery, label: "Gallery frame — light mat and a dark frame" }
+            - { value: none, label: "No frame — just the artwork" }
+      - name: room_frame
+        label: Frame style inside the room
+        type: select
+        description: How the artworks are framed on the full room page that opens from the door.
+        options:
+          values:
+            - { value: paper, label: "Pinned paper — taped to the wall, slightly tilted" }
+            - { value: sketch, label: "Sketched frame — a rough, hand-drawn border" }
+            - { value: gallery, label: "Gallery frame — light mat and a dark frame" }
+            - { value: none, label: "No frame — just the artwork" }
       - name: works
         label: Artworks (drag to reorder — the first one is the preview)
         component: artwork
@@ -86,6 +126,26 @@ content:
       - name: line
         label: Quote under the name
         type: string
+      - name: frame
+        label: Frame style in the row
+        type: select
+        description: How the artworks are framed in the sideways row on the main page.
+        options:
+          values:
+            - { value: paper, label: "Pinned paper — taped to the wall, slightly tilted" }
+            - { value: sketch, label: "Sketched frame — a rough, hand-drawn border" }
+            - { value: gallery, label: "Gallery frame — light mat and a dark frame" }
+            - { value: none, label: "No frame — just the artwork" }
+      - name: room_frame
+        label: Frame style inside the room
+        type: select
+        description: How the artworks are framed on the full room page that opens from the door.
+        options:
+          values:
+            - { value: paper, label: "Pinned paper — taped to the wall, slightly tilted" }
+            - { value: sketch, label: "Sketched frame — a rough, hand-drawn border" }
+            - { value: gallery, label: "Gallery frame — light mat and a dark frame" }
+            - { value: none, label: "No frame — just the artwork" }
       - name: works
         label: Artworks (drag to reorder — the first one is the preview)
         component: artwork
@@ -106,6 +166,26 @@ content:
       - name: line
         label: Quote under the name
         type: string
+      - name: frame
+        label: Frame style in the row
+        type: select
+        description: How the artworks are framed in the sideways row on the main page.
+        options:
+          values:
+            - { value: paper, label: "Pinned paper — taped to the wall, slightly tilted" }
+            - { value: sketch, label: "Sketched frame — a rough, hand-drawn border" }
+            - { value: gallery, label: "Gallery frame — light mat and a dark frame" }
+            - { value: none, label: "No frame — just the artwork" }
+      - name: room_frame
+        label: Frame style inside the room
+        type: select
+        description: How the artworks are framed on the full room page that opens from the door.
+        options:
+          values:
+            - { value: paper, label: "Pinned paper — taped to the wall, slightly tilted" }
+            - { value: sketch, label: "Sketched frame — a rough, hand-drawn border" }
+            - { value: gallery, label: "Gallery frame — light mat and a dark frame" }
+            - { value: none, label: "No frame — just the artwork" }
       - name: works
         label: Artworks (drag to reorder — the first one is the preview)
         component: artwork

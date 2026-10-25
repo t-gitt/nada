@@ -39,6 +39,7 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 html.lb-open { overflow: hidden; }
 body {
   margin: 0;
+  -webkit-user-select: none; user-select: none;
   background: var(--void);
   color: var(--blush);
   font: 300 clamp(1rem, 0.95rem + 0.3vw, 1.15rem)/1.75 var(--body);
@@ -119,22 +120,32 @@ body.power .eyes { opacity: 0; }
 .pair {
   position: absolute; display: flex; gap: calc(9px * var(--s, 1));
   transform: translate(var(--fx, 0), var(--fy, 0));
-  transition: transform 0.9s cubic-bezier(.2,.7,.2,1), opacity 0.6s ease;
+  will-change: transform, opacity;
+  /* Fading back in is slow; fading out (below) is quicker. Both are transitions,
+     so a pair caught halfway through either one turns around smoothly. */
+  transition: transform 1.1s cubic-bezier(.22,.61,.36,1), opacity 1.4s cubic-bezier(.4,0,.2,1);
 }
+.pair.placing { transition: none; }
 .pair i {
   display: block;
   width: calc(7px * var(--s, 1)); height: calc(7px * var(--s, 1));
   border-radius: 50%;
   background: #fffaf2;
-  box-shadow: 0 0 6px 2px rgba(255, 250, 240, 0.75), 0 0 22px 6px rgba(255, 240, 220, 0.18);
+  box-shadow: 0 0 6px 2px rgba(255, 250, 240, 0.75);
   transform: translate(var(--lx, 0), var(--ly, 0)) scaleY(1);
-  transition: transform 0.12s ease;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+/* The soft halo around both eyes, separate so it can linger after they shut */
+.pair::before {
+  content: ""; position: absolute; pointer-events: none; transition: opacity 0.6s ease;
+  inset: calc(-16px * var(--s, 1)) calc(-18px * var(--s, 1));
+  background: radial-gradient(closest-side, rgba(255, 240, 220, 0.2), rgba(255, 240, 220, 0.06) 60%, transparent);
 }
 .pair.blink i { transform: translate(var(--lx, 0), var(--ly, 0)) scaleY(0.08); }
-.pair.flee { opacity: 0; }
-.pair.flee i { transform: scaleY(0.05); }
-.pair.wake { animation: wake 1.2s ease both; }
-@keyframes wake { from { opacity: 0; } to { opacity: 1; } }
+/* Caught in the light: the eyes shut, and their glow goes out with them; nothing lingers */
+.pair.flee { opacity: 0; transition: transform 1s cubic-bezier(.22,.61,.36,1) 0.2s, opacity 0s linear 0.2s; }
+.pair.flee::before { opacity: 0; transition: opacity 0.16s ease-in; }
+.pair.flee i { transform: translate(var(--lx, 0), var(--ly, 0)) scaleY(0); opacity: 0; transition: transform 0.16s ease-in, opacity 0.08s linear 0.1s; }
 
 /* --------------------------------------------------------------------------
    Navigation & the light switch
@@ -143,7 +154,12 @@ body.power .eyes { opacity: 0; }
   position: fixed; inset: 0 0 auto 0; z-index: var(--z-nav);
   display: flex; align-items: center; gap: 2rem;
   padding: 18px var(--gutter);
-  background: linear-gradient(to bottom, rgba(11,9,9,0.85), rgba(11,9,9,0));
+}
+/* A band of shadow behind the nav: solid where the links sit, then fading out
+   below them, so scrolling text never shows through the menu */
+.nav::before {
+  content: ""; position: absolute; inset: 0 0 -56px 0; z-index: -2; pointer-events: none;
+  background: linear-gradient(to bottom, var(--void) 0%, rgba(11,9,9,0.96) 50%, rgba(11,9,9,0.7) 68%, rgba(11,9,9,0.3) 84%, rgba(11,9,9,0));
 }
 .brand {
   font: 300 0.82rem/1 var(--display); letter-spacing: 0.34em; text-transform: uppercase;
@@ -237,15 +253,11 @@ body.power .switch-tip { opacity: 0; pointer-events: none; }
   content: ""; position: absolute; inset: 0;
   background: linear-gradient(to top, var(--void) 0%, rgba(11,9,9,0.35) 45%, rgba(11,9,9,0.15) 100%);
 }
-.hero-title {
-  position: absolute; z-index: 1; left: 0; right: 0; top: 50%;
-  transform: translateY(-62%);
-  text-align: center; text-transform: uppercase;
-  font-size: clamp(3.2rem, 13vw, 13rem); letter-spacing: 0.06em; line-height: 0.92;
-  color: var(--bone); text-shadow: 0 4px 40px rgba(0,0,0,0.6);
+/* The name lives in the nav; this heading is only for search engines and screen readers */
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
 }
-.hero-title span { display: block; }
-.hero-title span + span { font-size: 0.42em; letter-spacing: 0.52em; margin-right: -0.52em; color: var(--blush); }
 
 .hero-whisper { max-width: 36ch; }
 .hero-whisper p { margin: 0 0 0.35em; font-size: clamp(1.05rem, 0.9rem + 0.7vw, 1.45rem); color: var(--bone); text-shadow: 0 2px 18px rgba(0,0,0,0.9); }
@@ -271,7 +283,7 @@ body.power .switch-tip { opacity: 0; pointer-events: none; }
 /* --------------------------------------------------------------------------
    Story
    -------------------------------------------------------------------------- */
-.story { position: relative; padding: clamp(80px, 16vh, 180px) var(--gutter) clamp(60px, 10vh, 120px); }
+.story { position: relative; overflow-x: clip; padding: clamp(80px, 16vh, 180px) var(--gutter) clamp(60px, 10vh, 120px); }
 .story-grid {
   display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
   gap: clamp(32px, 7vw, 120px); max-width: 1240px; margin: 0 auto; align-items: start;
@@ -291,15 +303,23 @@ body.power .switch-tip { opacity: 0; pointer-events: none; }
   color: var(--bone) !important; margin: 0.8em 0 1em !important;
 }
 .story-figure { margin: 0; position: sticky; top: 14vh; z-index: var(--z-lit); }
-.story-figure img { position: relative; width: 100%; max-width: 460px; margin-left: auto; box-shadow: 0 40px 80px rgba(0,0,0,0.6); }
+.story-figure img {
+  position: relative; width: 100%; max-width: 460px; margin-left: auto;
+  /* Feathered into the dark rather than a hard rectangle */
+  mask-image: radial-gradient(ellipse 48% 48% at 50% 50%, #000 60%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 48% 48% at 50% 50%, #000 60%, transparent 100%);
+}
 
-/* In the dark, the first drawing hangs under its own failing bulb */
+/* In the dark, the first drawing hangs under its own failing bulb.
+   Only opacity flickers, so phones composite the masked drawing once instead of
+   re-painting it every frame (which showed tile seams as lines while scrolling). */
 .story-figure::before {
   content: ""; position: absolute; inset: -18% -22%; pointer-events: none;
-  background: radial-gradient(ellipse 50% 50% at 50% 42%, rgba(246,217,196,0.16), rgba(246,217,196,0.05) 45%, transparent 70%);
+  background: radial-gradient(ellipse 50% 50% at 50% 42%, rgba(246,217,196,0.16), rgba(246,217,196,0.09) 25%, rgba(246,217,196,0.04) 50%, rgba(246,217,196,0.01) 70%, transparent 85%);
+  will-change: opacity;
   animation: bulb 7s linear infinite;
 }
-body:not(.power) .story-figure img { animation: bulb-art 7s linear infinite; }
+body:not(.power) .story-figure img { filter: sepia(0.12); will-change: opacity; animation: bulb-art 7s linear infinite; }
 body.power .story-figure::before { opacity: 0; animation: none; transition: opacity 0.6s; }
 @keyframes bulb {
   0%, 18%, 21%, 24%, 61%, 63.5%, 100% { opacity: 1; }
@@ -308,10 +328,10 @@ body.power .story-figure::before { opacity: 0; animation: none; transition: opac
   80% { opacity: 0.85; }
 }
 @keyframes bulb-art {
-  0%, 18%, 21%, 24%, 61%, 63.5%, 100% { filter: brightness(0.95) sepia(0.12); }
-  19.5%, 22.5% { filter: brightness(0.55) sepia(0.12); }
-  62% { filter: brightness(0.35) sepia(0.12); }
-  80% { filter: brightness(0.85) sepia(0.12); }
+  0%, 18%, 21%, 24%, 61%, 63.5%, 100% { opacity: 0.95; }
+  19.5%, 22.5% { opacity: 0.55; }
+  62% { opacity: 0.35; }
+  80% { opacity: 0.85; }
 }
 
 .jung {
@@ -361,92 +381,128 @@ body.power .story-figure::before { opacity: 0; animation: none; transition: opac
   display: block; position: relative; width: 100%; padding: 0; border: 0; background: none;
   cursor: zoom-in; text-align: left;
 }
-.work img { width: 100%; transition: transform 0.9s cubic-bezier(.2,.7,.2,1), filter 0.6s; }
+.work img { width: 100%; transition: transform 0.9s cubic-bezier(.2,.7,.2,1), filter 0.6s, box-shadow 0.6s; }
 .cap {
   display: block; font: 300 0.7rem/1 var(--display); letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--smoke); margin-top: 12px; transition: color 0.4s;
 }
 .work:hover .cap, .work:focus-visible .cap { color: var(--blush); }
 
-/* I · Early — sketches pinned to a wall */
-.wall {
-  max-width: 1320px; margin: 0 auto;
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: clamp(28px, 4vw, 56px) clamp(20px, 3vw, 44px); align-items: center; grid-auto-flow: dense;
+/* The corridor — every room is a sideways row you drag or swipe through */
+.track-wrap { position: relative; margin: 0 calc(var(--gutter) * -1); }
+.track {
+  display: flex; gap: clamp(24px, 3vw, 48px); align-items: center;
+  overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity;
+  padding: 30px var(--gutter) 40px; scrollbar-width: none; cursor: grab;
 }
-.room--early .work {
+.track::-webkit-scrollbar { display: none; }
+.track.dragging { cursor: grabbing; scroll-snap-type: none; }
+.track.dragging .work { pointer-events: none; }
+.track .work { flex: 0 0 auto; width: auto; scroll-snap-align: center; }
+.track .work img { height: clamp(260px, 52vh, 560px); width: auto; user-select: none; -webkit-user-drag: none; }
+.track .work:nth-child(even) { margin-top: 70px; }
+.track-controls { display: flex; align-items: center; gap: 18px; max-width: 1240px; margin: 10px auto 0; padding: 0 var(--gutter); }
+.track-btn {
+  width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(230,216,215,0.3);
+  background: none; cursor: pointer; transition: background 0.3s, border-color 0.3s;
+}
+.track-btn:hover { background: var(--umber-deep); border-color: var(--mauve); }
+.track-meter { flex: 1; height: 1px; background: rgba(230,216,215,0.16); position: relative; }
+.track-meter span { position: absolute; left: 0; top: -1px; height: 3px; width: 20%; background: var(--mauve); transform-origin: left; }
+
+/* The door at the end of the corridor: light leaks through the gap, and it swings open on hover */
+.door {
+  position: relative; display: flex; align-items: center; gap: 14px; margin-left: clamp(8px, 2vw, 28px);
+  text-decoration: none; color: var(--bone);
+}
+.door::before {
+  content: ""; position: absolute; left: -26px; top: 50%; width: 90px; height: 90px; translate: 0 -50%;
+  background: radial-gradient(closest-side, rgba(246,217,196,0.22), transparent); opacity: 0.4;
+  transition: opacity 0.7s; pointer-events: none;
+}
+.door-art { width: 34px; height: 50px; overflow: visible; flex: none; }
+.door-glow { fill: #f6d9c4; animation: door-light 3.4s ease-in-out infinite; }
+.door-frame { fill: none; stroke: rgba(230,216,215,0.55); stroke-width: 1.6; stroke-linejoin: round; }
+.door-leaf { transform-box: view-box; transform-origin: 6px 0; transform: scaleX(0.9); transition: transform 0.8s cubic-bezier(.3,1.3,.4,1); }
+.door-leaf rect { fill: #2a2120; stroke: rgba(230,216,215,0.4); stroke-width: 1; }
+.door-leaf circle { fill: var(--mauve); }
+.door:hover .door-leaf, .door:focus-visible .door-leaf { transform: scaleX(0.25); }
+.door:hover::before, .door:focus-visible::before { opacity: 1; }
+.door-text > span { display: block; font: 400 0.72rem/1.3 var(--display); letter-spacing: 0.22em; text-transform: uppercase; }
+.door-text small { display: block; font: italic 300 0.9rem/1.4 var(--body); color: var(--mauve); }
+@keyframes door-light { 0%, 100% { opacity: 0.75; } 45% { opacity: 1; } 52% { opacity: 0.55; } 56% { opacity: 0.95; } }
+
+/* The full room: every work at once, behind the door */
+html.room-open { overflow: hidden; }
+.room-all {
+  position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none;
+  margin: 0; border: 0; padding: clamp(80px, 12vh, 120px) var(--gutter) 80px;
+  background: var(--void); color: var(--blush); overflow-y: auto; overscroll-behavior: contain;
+}
+.room-all[open] { animation: door-open 1s cubic-bezier(.65,0,.25,1) both; }
+.room-all::backdrop { background: var(--void); }
+@keyframes door-open {
+  from { clip-path: inset(0 49.5% 0 49.5%); filter: brightness(2.4); }
+  55% { filter: brightness(1.25); }
+  to { clip-path: inset(0); filter: none; }
+}
+.room-all-head { max-width: 1320px; margin: 0 auto clamp(40px, 7vh, 70px); }
+.room-all-head h2 { font-size: clamp(2.2rem, 1.4rem + 3.4vw, 4.6rem); }
+.room-all-close {
+  position: fixed; top: 18px; right: var(--gutter); z-index: 3; padding: 12px 20px;
+  background: rgba(11,9,9,0.85); border: 1px solid rgba(230,216,215,0.3); border-radius: 999px; cursor: pointer;
+  font: 400 0.7rem/1 var(--display); letter-spacing: 0.2em; text-transform: uppercase; color: var(--bone);
+  transition: background 0.3s, border-color 0.3s;
+}
+.room-all-close:hover { background: var(--umber-deep); border-color: var(--mauve); }
+.grid {
+  max-width: 1320px; margin: 0 auto; padding-top: 14px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); align-items: center;
+  gap: clamp(40px, 5vw, 64px) clamp(28px, 3vw, 48px);
+}
+
+/* Frame styles — each room picks one for its row (frame) and one for the full room (room_frame):
+   paper | sketch | gallery | none. The class sits on the gallery itself. */
+
+/* Pinned paper: taped to the wall, slightly tilted */
+.frame--paper .work {
   background: #ece6e2; padding: 10px 10px 0; transform: rotate(var(--rot));
   box-shadow: 0 18px 40px rgba(0,0,0,0.55), 0 2px 4px rgba(0,0,0,0.4);
   transition: transform 0.6s cubic-bezier(.2,.7,.2,1), box-shadow 0.6s;
 }
-.room--early .work::before {
+.frame--paper .work::before {
   content: ""; position: absolute; top: -10px; left: 50%; width: 74px; height: 22px;
   transform: translateX(-50%) rotate(calc(var(--rot) * -1.6));
   background: rgba(187,149,147,0.55); box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
-.room--early .work .cap { color: #6b5f5d; padding: 10px 2px 12px; margin: 0; font-size: 0.62rem; }
-.room--early .work:hover, .room--early .work:focus-visible {
-  transform: rotate(0) scale(1.05); z-index: 2; box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+.frame--paper .work .cap { color: #6b5f5d; padding: 10px 2px 12px; margin: 0; font-size: 0.62rem; }
+.frame--paper .work:hover, .frame--paper .work:focus-visible {
+  transform: rotate(0) scale(1.04); z-index: 2; box-shadow: 0 30px 60px rgba(0,0,0,0.7);
 }
-.room--early .work.is-wide { grid-column: span 2; }
 
-/* II · Charcoal — masonry with smudged, hand-drawn frames */
-.masonry { max-width: 1240px; margin: 0 auto; columns: 3 280px; column-gap: clamp(28px, 4vw, 60px); }
-.room--charcoal .work { break-inside: avoid; margin: 0 0 clamp(40px, 6vw, 72px); padding: 14px; }
-.room--charcoal .work::after {
+/* Sketched frame: a rough, hand-drawn border */
+.frame--sketch .work { padding: 14px; }
+.frame--sketch .work::after {
   content: ""; position: absolute; inset: 0 0 26px; pointer-events: none;
   border: 2px solid rgba(230,216,215,0.35); filter: url(#rough);
   transition: border-color 0.5s, inset 0.6s cubic-bezier(.2,.7,.2,1);
 }
-.room--charcoal .work:hover::after { border-color: rgba(187,149,147,0.8); inset: -8px -8px 18px; }
-.room--charcoal .work:hover img { transform: scale(1.015); }
-.room--charcoal .work:nth-child(3n+2) { margin-top: 60px; }
+.frame--sketch .work:hover::after { border-color: rgba(187,149,147,0.8); inset: -8px -8px 18px; }
+.frame--sketch .work:hover img { transform: scale(1.015); }
 
-/* III · Ink — a horizontal scroll, like an unrolled sheet */
-.ink-wrap { position: relative; margin: 0 calc(var(--gutter) * -1); }
-.ink-track {
-  display: flex; gap: clamp(20px, 3vw, 48px); align-items: center;
-  overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity;
-  padding: 20px var(--gutter) 30px; scrollbar-width: none; cursor: grab;
+/* Gallery frame: a light mat inside a dark frame */
+.frame--gallery .work img {
+  padding: clamp(8px, 1vw, 14px); background: #e9e1de;
+  border: clamp(4px, 0.5vw, 7px) solid #1d1615;
+  box-shadow: 0 0 0 1px rgba(230,216,215,0.14), 0 22px 46px rgba(0,0,0,0.65), inset 0 0 6px rgba(0,0,0,0.35);
 }
-.ink-track::-webkit-scrollbar { display: none; }
-.ink-track.dragging { cursor: grabbing; scroll-snap-type: none; }
-.ink-track.dragging .work { pointer-events: none; }
-.room--ink .work { flex: 0 0 auto; width: auto; scroll-snap-align: center; }
-.room--ink .work img { height: clamp(300px, 62vh, 640px); width: auto; user-select: none; -webkit-user-drag: none; }
-.room--ink .work:nth-child(even) { margin-top: 70px; }
-.room--ink .work:hover img { transform: translateY(-8px); }
-.ink-controls { display: flex; align-items: center; gap: 18px; max-width: 1240px; margin: 10px auto 0; padding: 0 var(--gutter); }
-.ink-btn {
-  width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(230,216,215,0.3);
-  background: none; cursor: pointer; transition: background 0.3s, border-color 0.3s;
+.frame--gallery .work .cap { text-align: center; }
+.frame--gallery .work:hover img, .frame--gallery .work:focus-visible img {
+  transform: translateY(-6px); box-shadow: 0 0 0 1px rgba(187,149,147,0.5), 0 34px 60px rgba(0,0,0,0.75), inset 0 0 6px rgba(0,0,0,0.35);
 }
-.ink-btn:hover { background: var(--umber-deep); border-color: var(--mauve); }
-.ink-meter { flex: 1; height: 1px; background: rgba(230,216,215,0.16); position: relative; }
-.ink-meter span { position: absolute; left: 0; top: -1px; height: 3px; width: 20%; background: var(--mauve); transform-origin: left; }
 
-/* IV · Digital — cinematic grid */
-.cinema {
-  max-width: 1320px; margin: 0 auto;
-  display: grid; grid-template-columns: repeat(6, 1fr); grid-auto-flow: dense;
-  gap: clamp(10px, 1.4vw, 18px);
-}
-.room--digital .work { grid-column: span 2; overflow: hidden; background: var(--soot); }
-.room--digital .work.is-wide { grid-column: span 4; }
-.room--digital .work img { width: 100%; height: 100%; aspect-ratio: 1131 / 1600; object-fit: cover; }
-.room--digital .work.is-wide img { aspect-ratio: 1600 / 1131; }
-.room--digital .work .cap {
-  position: absolute; left: 14px; bottom: 12px; margin: 0; color: var(--bone);
-  opacity: 0; transform: translateY(6px); transition: opacity 0.4s, transform 0.4s;
-}
-.room--digital .work::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(to top, rgba(0,0,0,0.65), transparent 40%);
-  opacity: 0; transition: opacity 0.4s;
-}
-.room--digital .work:hover img { transform: scale(1.06); }
-.room--digital .work:hover .cap, .room--digital .work:focus-visible .cap { opacity: 1; transform: none; z-index: 1; }
-.room--digital .work:hover::after { opacity: 1; }
+/* No frame: just the artwork */
+.frame--none .work:hover img, .frame--none .work:focus-visible img { transform: translateY(-8px); }
 
 /* Hand-drawn divider */
 .scribble { display: block; width: min(1200px, calc(100% - 2 * var(--gutter))); height: 60px; margin: 0 auto; overflow: visible; }
@@ -486,8 +542,9 @@ body.power .story-figure::before { opacity: 0; animation: none; transition: opac
 }
 .contact-creature {
   position: absolute; right: -4vw; bottom: 0; height: 95%; width: auto; max-width: none;
-  opacity: 0.85; mask-image: linear-gradient(to left, #000 55%, transparent);
-  -webkit-mask-image: linear-gradient(to left, #000 55%, transparent);
+  opacity: 0.85;
+  mask-image: radial-gradient(ellipse 58% 60% at 58% 55%, #000 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 58% 60% at 58% 55%, #000 40%, transparent 100%);
 }
 .contact h2 { font-size: clamp(3rem, 1.6rem + 7vw, 9rem); line-height: 0.95; }
 .socials { list-style: none; padding: 0; margin: clamp(2rem, 6vh, 4rem) 0 0; display: flex; flex-wrap: wrap; gap: 1rem 2.6rem; }
@@ -545,18 +602,16 @@ body.power .story-figure::before { opacity: 0; animation: none; transition: opac
   .story-figure img { margin: 0 auto; max-width: 380px; }
   .about-figure img { max-width: 420px; }
   .hero { grid-template-columns: 1fr; }
-  .hero-title { top: 16%; transform: none; font-size: clamp(3.2rem, 17vw, 7rem); }
   .hint { text-align: left; margin-top: 1.6rem; }
 }
 @media (max-width: 640px) {
-  .room--early .work.is-wide { grid-column: auto; }
-  .wall { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 18px; }
-  .room--early .work::before { width: 48px; height: 16px; }
-  .room--charcoal .work:nth-child(3n+2) { margin-top: 0; }
-  .cinema { grid-template-columns: repeat(2, 1fr); }
-  .room--digital .work, .room--digital .work.is-wide { grid-column: span 1; }
-  .room--digital .work.is-wide { grid-column: span 2; }
-  .room--ink .work:nth-child(even) { margin-top: 40px; }
+  .track .work img { height: 46vh; }
+  .track .work:nth-child(even) { margin-top: 40px; }
+  .track-controls { flex-wrap: wrap; }
+  .door { flex-basis: 100%; justify-content: center; margin: 22px 0 0; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 18px; }
+  .frame--paper .work::before { width: 48px; height: 16px; }
+  .frame--gallery .work img { padding: 6px; border-width: 4px; }
   .room-list a { grid-template-columns: 2.6rem 1fr; }
   .room-list .count { grid-column: 2; }
   .timeline li { grid-template-columns: 1fr; gap: 0.2rem; }

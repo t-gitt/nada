@@ -15,7 +15,22 @@ the portfolio. Changes go live about a minute after you press **Save**.
 ## Reorder or remove artworks
 
 In the room, drag artworks up or down by their handle, or use the item's menu to delete one. The
-**first** artwork is the preview that appears when someone hovers over the room's name on the home page.
+**first** artwork is the preview that appears when someone hovers over the room's name on the home page,
+and the first one in the room's sideways row.
+
+## Change how a room's artworks are framed
+
+Each room has two frame settings:
+
+- **Frame style in the row:** the sideways row on the main page.
+- **Frame style inside the room:** the full page that opens from the door.
+
+Each one can be:
+
+- **Pinned paper:** taped to the wall and slightly tilted.
+- **Sketched frame:** a rough, hand-drawn border.
+- **Gallery frame:** a light mat inside a dark frame.
+- **No frame:** just the artwork.
 
 ## Change any text
 

@@ -15,13 +15,14 @@ const ROOT = path.dirname(new URL(import.meta.url).pathname);
 const DIST = path.join(ROOT, 'dist');
 const CACHE = path.join(ROOT, '.cache/img');
 
-// The four rooms each have their own hand-made layout, so their order is fixed here.
+// The rooms, in order. Each one's frame style is chosen in its content file.
 const ROOMS = [
-  { id: 'early', nav: 'Early', num: 'I', layout: 'wall', eyes: 3 },
-  { id: 'charcoal', nav: 'Charcoal', num: 'II', layout: 'masonry', eyes: 3 },
-  { id: 'ink', nav: 'Ink', num: 'III', layout: 'ink-track', eyes: 3 },
-  { id: 'digital', nav: 'Digital', num: 'IV', layout: 'cinema', eyes: 4 },
+  { id: 'early', nav: 'Early', num: 'I', eyes: 3 },
+  { id: 'charcoal', nav: 'Charcoal', num: 'II', eyes: 3 },
+  { id: 'ink', nav: 'Ink', num: 'III', eyes: 3 },
+  { id: 'digital', nav: 'Digital', num: 'IV', eyes: 4 },
 ];
+const FRAMES = ['paper', 'sketch', 'gallery', 'none'];
 const DIVIDERS = [
   'M10 50 C 120 10, 180 70, 300 40 S 480 10, 560 45 S 700 75, 820 35 S 1000 20, 1080 50 S 1170 60, 1190 30',
   'M10 30 C 160 70, 240 10, 380 42 S 560 70, 640 30 S 820 8, 900 46 S 1080 70, 1190 40',
@@ -100,7 +101,6 @@ async function build() {
       return {
         ...wk.image,
         full: wk.image.src,
-        wide: wk.image.w > wk.image.h,
         short: wk.title ? `${wk.title}${wk.year ? ` · ${wk.year}` : ''}` : `${title} · ${number}`,
         caption: plain(details.length ? details.join(' · ') : title),
         label: plain(wk.title || `${title} work ${n + 1}`),
@@ -111,21 +111,23 @@ async function build() {
       ...r,
       title,
       line: data.line,
+      frame: FRAMES.includes(data.frame) ? data.frame : 'sketch',
+      roomFrame: FRAMES.includes(data.room_frame) ? data.room_frame : 'gallery',
       works,
       count: `${works.length} ${works.length === 1 ? 'work' : 'works'}`,
       peek: works[0]?.sm,
-      isInk: r.id === 'ink',
       divider: i < ROOMS.length - 1 ? DIVIDERS[i % DIVIDERS.length] : null,
     });
   }
 
   const template = await fs.readFile(path.join(ROOT, 'src/index.html'), 'utf8');
+  const work = await fs.readFile(path.join(ROOT, 'src/work.html'), 'utf8');
   const html = Mustache.render(template, {
     ...site,
     roomList,
     year: new Date().getFullYear(),
     version: Date.now().toString(36),
-  });
+  }, { work });
   await fs.writeFile(path.join(DIST, 'index.html'), html);
 
   for (const f of ['style.css', 'main.js', 'favicon.svg']) {

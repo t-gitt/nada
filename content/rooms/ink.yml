@@ -1,5 +1,7 @@
 title: "Ink"
 line: "What I couldn’t put into words, I poured onto paper."
+frame: sketch
+room_frame: gallery
 works:
   - image: /media/ink/01.png
   - image: /media/ink/02.png

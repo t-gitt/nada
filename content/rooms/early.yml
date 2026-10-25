@@ -1,5 +1,7 @@
 title: "The Early Beginning"
 line: "Line by line, I gave them form."
+frame: sketch
+room_frame: gallery
 works:
   - image: /media/early/01.jpg
   - image: /media/early/02.jpg

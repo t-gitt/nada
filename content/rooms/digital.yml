@@ -1,5 +1,7 @@
 title: "Digital"
 line: "They had always been there, hiding in the corners."
+frame: sketch
+room_frame: gallery
 works:
   - image: /media/digital/01.jpg
   - image: /media/digital/02.jpg
