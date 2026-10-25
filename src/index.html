@@ -1,0 +1,227 @@
+<!doctype html>
+<!--
+  This is a template. Words live in content/site.yml, artworks in content/rooms/*.yml.
+  `npm run build` fills it in and writes the finished site to dist/.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{{title}}}</title>
+  <meta name="description" content="{{{description}}}">
+  <meta name="theme-color" content="#0b0909">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="{{{title}}}">
+  <meta property="og:description" content="{{{description}}}">
+  <meta property="og:image" content="{{hero.image.src}}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500&family=Raleway:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v={{version}}">
+</head>
+<body>
+  <!-- Rough, hand-drawn edge used on charcoal frames and scribbles -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="rough">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7"/>
+      <feDisplacementMap in="SourceGraphic" scale="7"/>
+    </filter>
+  </svg>
+
+  <a class="skip" href="#story">Skip to content</a>
+
+  <div class="darkness" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="peek" aria-hidden="true"><img alt=""></div>
+
+  <header class="nav">
+    <a class="brand" href="#threshold">Nada Abu Taleb</a>
+    <button class="menu-btn" aria-expanded="false" aria-controls="menu">Menu</button>
+    <nav id="menu" class="menu" aria-label="Main">
+      <a href="#story">The Story</a>
+      {{#roomList}}
+      <a href="#{{id}}">{{nav}}</a>
+      {{/roomList}}
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button class="switch" type="button" aria-pressed="false">
+      <span class="switch-plate" aria-hidden="true"><span class="switch-lever"></span></span>
+      <span class="switch-label">Lights on</span>
+    </button>
+    <button class="switch-tip" type="button" tabindex="-1" aria-hidden="true">
+      <svg viewBox="0 0 90 70" aria-hidden="true"><path d="M8 64 C 18 40, 40 22, 78 10 M 64 6 L 79 10 L 70 22"/></svg>
+      <span>Too dark?<br>Turn the lights on.</span>
+    </button>
+  </header>
+
+  <main>
+    <!-- I. The threshold -->
+    <section id="threshold" class="hero">
+      <div class="eyes" data-eyes="11"></div>
+      {{#hero.image}}
+      <img class="hero-art" src="{{src}}" width="{{w}}" height="{{h}}" alt="{{{hero.image_alt}}}" fetchpriority="high">
+      {{/hero.image}}
+      <h1 class="hero-title"><span>Nada</span> <span>Abu Taleb</span></h1>
+
+      <div class="hero-whisper lit">
+        <p class="kicker" data-reveal>{{{hero.greeting}}}</p>
+        {{#hero.lines}}
+        <p data-reveal>{{{.}}}</p>
+        {{/hero.lines}}
+        <p class="small" data-reveal>{{{hero.small}}}</p>
+        <p class="small mauve" data-reveal>{{{hero.warning}}}</p>
+      </div>
+
+      <p class="hint lit" aria-hidden="true">
+        <span class="hint-fine">Move your light.</span>
+        <span class="hint-coarse">Scroll through the dark.</span>
+        <span class="hint-sub">Something is watching.</span>
+      </p>
+    </section>
+
+    <!-- II. The story -->
+    <section id="story" class="story">
+      <div class="eyes eyes--edges" data-eyes="4"></div>
+      <div class="story-grid">
+        <div class="story-text">
+          <header class="story-head">
+            {{#story.photo}}
+            <figure class="avatar">
+              <img src="{{sm}}" alt="Nada Abu Taleb" loading="lazy" width="{{w}}" height="{{h}}">
+            </figure>
+            {{/story.photo}}
+            <p class="eyebrow lit" data-reveal>{{{story.eyebrow}}}</p>
+            <h2 class="lit" data-reveal>{{{story.heading}}}</h2>
+          </header>
+
+          {{#story.before}}
+          <p class="lit" data-reveal>{{{.}}}</p>
+          {{/story.before}}
+          <p class="question lit" data-reveal>{{{story.question}}}</p>
+          {{#story.after}}
+          <p class="lit" data-reveal>{{{.}}}</p>
+          {{/story.after}}
+        </div>
+        {{#story.artwork}}
+        <figure class="story-figure">
+          <img src="{{sm}}" alt="{{{story.artwork_alt}}}" loading="lazy" width="{{w}}" height="{{h}}">
+        </figure>
+        {{/story.artwork}}
+      </div>
+
+      <blockquote class="jung lit" data-reveal>
+        <p>{{{story.quote}}}</p>
+        <cite>— {{{story.quote_author}}}</cite>
+      </blockquote>
+
+      <div class="story-coda">
+        {{#story.closing}}
+        <p class="lit" data-reveal>{{{.}}}</p>
+        {{/story.closing}}
+        <p class="lit mauve" data-reveal>{{{story.last_line}}}</p>
+      </div>
+    </section>
+
+    <!-- III. The rooms -->
+    <section class="rooms-index" aria-labelledby="rooms-title">
+      <p class="eyebrow lit" data-reveal>{{{rooms.eyebrow}}}</p>
+      <h2 id="rooms-title" class="lit" data-reveal>{{{rooms.heading}}} <span class="mauve">{{{rooms.heading_accent}}}</span></h2>
+      <ol class="room-list lit">
+        {{#roomList}}
+        <li data-reveal><a href="#{{id}}" data-peek="{{peek}}"><span class="num">{{num}}</span><span class="name">{{{title}}}</span><span class="count">{{count}}</span></a></li>
+        {{/roomList}}
+      </ol>
+    </section>
+
+    {{#roomList}}
+    <section id="{{id}}" class="room room--{{id}}">
+      <div class="eyes eyes--edges" data-eyes="{{eyes}}"></div>
+      <header class="room-head lit">
+        <p class="eyebrow" data-reveal>Room {{num}} · {{count}}</p>
+        <h2 data-reveal>{{{title}}}</h2>
+        {{#line}}<p class="room-line" data-reveal>“{{{line}}}”</p>{{/line}}
+      </header>
+      {{#isInk}}
+      <div class="ink-wrap">
+        <div class="ink-track gallery" tabindex="0" aria-label="{{{title}}} works, scroll sideways">
+      {{/isInk}}
+      {{^isInk}}
+      <div class="{{layout}} gallery">
+      {{/isInk}}
+        {{#works}}
+        <button type="button" class="work{{#wide}} is-wide{{/wide}}" data-full="{{full}}" data-w="{{w}}" data-h="{{h}}" data-caption="{{{caption}}}" aria-label="View {{{label}}}">
+          <img src="{{sm}}" width="{{w}}" height="{{h}}" alt="{{{alt}}}" loading="lazy" decoding="async" draggable="false">
+          <span class="cap">{{{short}}}</span>
+        </button>
+        {{/works}}
+      </div>
+      {{#isInk}}
+        <div class="ink-controls lit">
+          <button type="button" class="ink-btn" data-dir="-1" aria-label="Previous works">←</button>
+          <span class="ink-meter"><span></span></span>
+          <button type="button" class="ink-btn" data-dir="1" aria-label="Next works">→</button>
+        </div>
+      </div>
+      {{/isInk}}
+    </section>
+    {{#divider}}
+    <svg class="scribble lit" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="{{divider}}"/></svg>
+    {{/divider}}
+    {{/roomList}}
+
+    <!-- IV. About -->
+    <section id="about" class="about">
+      <div class="eyes eyes--edges" data-eyes="3"></div>
+      {{#about.portrait}}
+      <figure class="about-figure">
+        <img src="{{src}}" alt="{{{about.portrait_alt}}}" loading="lazy" width="{{w}}" height="{{h}}">
+      </figure>
+      {{/about.portrait}}
+      <div class="about-text lit">
+        <p class="eyebrow" data-reveal>About</p>
+        <h2 data-reveal>{{{about.heading}}}</h2>
+        {{#about.paragraphs}}
+        <p data-reveal>{{{.}}}</p>
+        {{/about.paragraphs}}
+
+        <ol class="timeline">
+          {{#about.timeline}}
+          <li data-reveal><span class="yr">{{{year}}}</span><span>{{{text}}}</span></li>
+          {{/about.timeline}}
+        </ol>
+      </div>
+    </section>
+
+    <!-- V. Contact -->
+    <footer id="contact" class="contact">
+      <div class="eyes" data-eyes="5"></div>
+      {{#contact.creature}}
+      <img class="contact-creature" src="{{sm}}" alt="" loading="lazy" width="{{w}}" height="{{h}}">
+      {{/contact.creature}}
+      <h2 class="lit" data-reveal>{{{contact.heading}}}</h2>
+      {{#contact.email}}
+      <p class="email lit" data-reveal><a href="mailto:{{{contact.email}}}">{{{contact.email}}}</a></p>
+      {{/contact.email}}
+      <ul class="socials lit">
+        {{#contact.links}}
+        <li data-reveal><a href="{{{url}}}" target="_blank" rel="noopener">{{{label}}}</a></li>
+        {{/contact.links}}
+      </ul>
+      <p class="copyright lit">© {{year}} {{{contact.footer}}}</p>
+    </footer>
+  </main>
+
+  <dialog id="lightbox" class="lightbox" aria-label="Artwork viewer">
+    <figure>
+      <img class="lb-img" alt="">
+      <figcaption class="lb-cap"></figcaption>
+    </figure>
+    <button type="button" class="lb-btn lb-prev" aria-label="Previous work">←</button>
+    <button type="button" class="lb-btn lb-next" aria-label="Next work">→</button>
+    <button type="button" class="lb-btn lb-close" aria-label="Close">✕</button>
+  </dialog>
+
+  <script src="main.js?v={{version}}"></script>
+</body>
+</html>

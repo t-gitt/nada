@@ -1,0 +1,73 @@
+# All the words on the site. Edit in Pages CMS (app.pagescms.org) or right here.
+# Wrap words in *asterisks* to make them italic.
+
+title: "Nada Abu Taleb — What Lurks in the Darkness"
+description: "Nada Abu Taleb is a Yemeni visual artist drawing the shadows that live in the dark — charcoal, ink and digital works since 2011."
+
+hero:
+  image: /media/site/hero.jpg
+  image_alt: "Tall shadow creatures with glowing eyes gather in a misty forest"
+  greeting: "Hello, Stranger!"
+  lines:
+    - "Are you lost, or did you find your way here on purpose?"
+    - "Either way, *welcome.*"
+  small: "You’re safe here — a space where shadows come alive, revealing beauty in darkness and curiosity in the unseen."
+  warning: "Just watch your toes; things might get thrilling."
+
+story:
+  photo: /media/site/nada.jpg
+  eyebrow: "I’m Nada Abu Taleb"
+  heading: "This is how it started"
+  before:
+    - "The nights back then were brutal. Power outages left us in complete darkness, and the sound of gunfire echoed in the distance. Machine guns rattled like some twisted soundtrack, and we spent those hours waiting — for what, I don’t know."
+    - "One of those nights, when the silence felt heavier than usual, I grabbed a pencil and an empty sheet of paper. I didn’t know why — maybe just to do something, anything. But as I stared into the dark, one question hit me hard:"
+  question: "“What lurks in the darkness?”"
+  after:
+    - "In that moment, and for the first time, I knew I wasn’t alone. Dark, shapeless figures seemed to close in around me, pressing against my skin and whispering things I didn’t want to hear. They weren’t new — they had always been there, hiding in the corners, waiting for me to finally notice them."
+  artwork: /media/charcoal/01.jpg
+  artwork_alt: "Charcoal drawing of a faceless, skeletal figure surrounded by floating orbs"
+  quote: "The shadow is a living component of our personality and seeks to coexist with us in some form."
+  quote_author: "Carl Jung"
+  closing:
+    - "These shadows weren’t just figments of my imagination — they were a part of me, impossible to dismiss or ignore."
+    - "So I began to draw them. Line by line, I gave them form — huge bodies, jagged limbs, hollow eyes. What I couldn’t put into words, I poured onto paper. Each drawing felt like a confrontation, a way of bringing those shadows out of hiding and facing them head-on."
+  last_line: "And in doing so, I began to understand them — and myself — a little more."
+
+rooms:
+  eyebrow: "The work"
+  heading: "Four rooms."
+  heading_accent: "Bring your light."
+
+about:
+  portrait: /media/site/portrait.jpg
+  portrait_alt: "Silhouette of Nada Abu Taleb in a wide-brimmed hat beside a bright window"
+  heading: "Nada Abu Taleb"
+  paragraphs:
+    - "Nada Abu Taleb is a Yemeni visual artist, practicing since 2011, and using art as a profound method of self-expression and exploration. Her artistic journey began with encouragement from her mother."
+    - "Her residencies at the American Academy in Rome and the Bogliasco Foundation further cemented her identity as a resilient artist with a story to tell — one shaped by perseverance, creativity, and a profound connection to her journey."
+  timeline:
+    - year: "2011"
+      text: "President’s Award for Fine Arts, Sana’a — her first public recognition."
+    - year: "2014"
+      text: "“Behance Coin” for fine arts at Behance Sana’a. Debut solo exhibition, *When Feelings Act*, at the Basement Cultural Foundation, Yemen."
+    - year: "2015"
+      text: "Graduated from the British Council’s Springboard program (Artists Edition); presented a sculpture in the exhibition *SHE*."
+    - year: "2016"
+      text: "Yemen Peace Project’s second International Yemeni Film & Arts Festival."
+    - year: "2017"
+      text: "Second solo exhibition, *Leave It Unspoken*."
+    - year: "2023"
+      text: "Artist Protection Fund fellowship — a four-month residency at the American Academy in Rome, followed by a month at the Bogliasco Foundation."
+
+contact:
+  heading: "Let’s stay in touch!"
+  email: ""
+  creature: /media/site/creature.jpg
+  links:
+    - label: "Instagram"
+      url: "https://www.instagram.com/nadaabutalebs_art/"
+    - label: "Facebook"
+      url: "https://www.facebook.com/nada.abutalib/"
+    - label: "LinkedIn"
+      url: "https://ye.linkedin.com/in/nada-abu-taleb-14a97450"
+  footer: "Nada Abu Taleb’s Art. All works © the artist."

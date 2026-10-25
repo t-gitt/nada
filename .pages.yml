@@ -1,0 +1,199 @@
+# Pages CMS — the editing dashboard at https://app.pagescms.org
+# Every save commits to the repo and the site redeploys automatically.
+
+media:
+  input: media
+  output: /media
+  extensions: [jpg, jpeg, png, webp]
+
+components:
+  artwork:
+    type: object
+    fields:
+      - name: image
+        label: Image
+        type: image
+        required: true
+        description: Upload the full-size photo or scan. It's resized automatically.
+        options:
+          rename: safe
+      - name: title
+        label: Title
+        type: string
+        description: Optional. Without a title it's shown as e.g. "Charcoal · 03".
+      - name: year
+        label: Year
+        type: string
+      - name: medium
+        label: Medium & size
+        type: string
+        description: "e.g. Charcoal on paper, 50 × 70 cm"
+      - name: description
+        label: Description for screen readers
+        type: text
+        description: Optional. A sentence describing what's in the picture.
+
+content:
+  - name: early
+    label: "Room I · The Early Beginning"
+    type: file
+    path: content/rooms/early.yml
+    format: yaml
+    fields:
+      - name: title
+        label: Room name
+        type: string
+      - name: line
+        label: Quote under the name
+        type: string
+      - name: works
+        label: Artworks (drag to reorder — the first one is the preview)
+        component: artwork
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{index}. {title}"
+
+  - name: charcoal
+    label: "Room II · Charcoal"
+    type: file
+    path: content/rooms/charcoal.yml
+    format: yaml
+    fields:
+      - name: title
+        label: Room name
+        type: string
+      - name: line
+        label: Quote under the name
+        type: string
+      - name: works
+        label: Artworks (drag to reorder — the first one is the preview)
+        component: artwork
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{index}. {title}"
+
+  - name: ink
+    label: "Room III · Ink"
+    type: file
+    path: content/rooms/ink.yml
+    format: yaml
+    fields:
+      - name: title
+        label: Room name
+        type: string
+      - name: line
+        label: Quote under the name
+        type: string
+      - name: works
+        label: Artworks (drag to reorder — the first one is the preview)
+        component: artwork
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{index}. {title}"
+
+  - name: digital
+    label: "Room IV · Digital"
+    type: file
+    path: content/rooms/digital.yml
+    format: yaml
+    fields:
+      - name: title
+        label: Room name
+        type: string
+      - name: line
+        label: Quote under the name
+        type: string
+      - name: works
+        label: Artworks (drag to reorder — the first one is the preview)
+        component: artwork
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{index}. {title}"
+
+  - name: site
+    label: Site text & photos
+    type: file
+    path: content/site.yml
+    format: yaml
+    fields:
+      - name: title
+        label: Browser tab title
+        type: string
+      - name: description
+        label: Search engine description
+        type: text
+
+      - name: hero
+        label: Welcome screen
+        type: object
+        fields:
+          - { name: image, label: Background artwork, type: image }
+          - { name: image_alt, label: Background description, type: string }
+          - { name: greeting, label: Greeting, type: string }
+          - { name: lines, label: Lines, type: string, list: true }
+          - { name: small, label: Small text, type: text }
+          - { name: warning, label: Last line, type: string }
+
+      - name: story
+        label: The story
+        type: object
+        fields:
+          - { name: photo, label: Small round photo of Nada, type: image }
+          - { name: eyebrow, label: Small heading, type: string }
+          - { name: heading, label: Heading, type: string }
+          - { name: before, label: Paragraphs before the question, type: text, list: true }
+          - { name: question, label: The question, type: string }
+          - { name: after, label: Paragraphs after the question, type: text, list: true }
+          - { name: artwork, label: Artwork beside the story, type: image }
+          - { name: artwork_alt, label: Artwork description, type: string }
+          - { name: quote, label: Big quote, type: text }
+          - { name: quote_author, label: Quote author, type: string }
+          - { name: closing, label: Closing paragraphs, type: text, list: true }
+          - { name: last_line, label: Final line, type: text }
+
+      - name: rooms
+        label: Rooms intro
+        type: object
+        fields:
+          - { name: eyebrow, label: Small heading, type: string }
+          - { name: heading, label: Heading, type: string }
+          - { name: heading_accent, label: Heading (pink part), type: string }
+
+      - name: about
+        label: About
+        type: object
+        fields:
+          - { name: portrait, label: Portrait, type: image }
+          - { name: portrait_alt, label: Portrait description, type: string }
+          - { name: heading, label: Heading, type: string }
+          - { name: paragraphs, label: Paragraphs, type: text, list: true }
+          - name: timeline
+            label: Timeline (newest at the bottom)
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{year}"
+            fields:
+              - { name: year, label: Year, type: string }
+              - { name: text, label: What happened, type: text }
+
+      - name: contact
+        label: Contact
+        type: object
+        fields:
+          - { name: heading, label: Heading, type: string }
+          - { name: email, label: Email (leave empty to hide), type: string }
+          - { name: creature, label: Background artwork, type: image }
+          - name: links
+            label: Social links
+            type: object
+            list: true
+            fields:
+              - { name: label, label: Name, type: string }
+              - { name: url, label: Link, type: string }
+          - { name: footer, label: Footer text, type: string }
